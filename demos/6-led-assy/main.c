@@ -14,7 +14,6 @@ int main(void) {
   or_sr(0x18);		/* CPU off, GIE on */
 }
 
-
 // blink state machine
 static int blinkLimit = 5;   //  state var representing reciprocal of duty cycle 
 void blinkUpdate() // called every 1/250s to blink with duty cycle 1/blinkLimit
@@ -55,4 +54,3 @@ void __interrupt_vec(WDT_VECTOR) WDT()	/* 250 interrupts/sec */
   // handle blinking   
   timeAdvStateMachines();
 } 
-

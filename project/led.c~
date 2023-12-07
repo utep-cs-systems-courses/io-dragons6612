@@ -1,0 +1,61 @@
+#include <msp430.h>
+#include "led.h"
+#include "switches.h"
+#include "buzzer.h"
+
+void led_init()
+{
+  P1DIR |= LEDS;		// bits attached to leds are output
+  switch_state_changed = 1;
+  led_update();
+  buzzer_init();
+  
+}
+
+void led_update(){
+  if (switch_state_changed) {
+    char ledFlags = 0; /* by default, no LEDs on */
+
+    ledFlags |= switch_state_down1 ? LED_GREEN : 0;
+    ledFlags |= switch_state_down1 ? 0 : LED_RED;
+
+    ledFlags |= switch_state_down2 ? 0 : LED_RED;
+    ledFlags |= switch_state_down2 ? LED_GREEN : 0;
+
+    ledFlags |= switch_state_down3 ? LED_GREEN : 0;
+    ledFlags |= switch_state_down3 ? 0 : LED_RED;
+
+    ledFlags |= switch_state_down4 ? 0 : 0;
+    ledFlags |= switch_state_down4 ? LED_RED : 0;
+
+    P1OUT &= (0xff - LEDS) | ledFlags; // clear bits for off leds
+    P1OUT |= ledFlags;         // set bits for on leds
+  }
+  switch_state_changed = 0;
+}
+
+// global state vars that control blinking
+int blinkLimit = 5;  // duty cycle = 1/blinkLimit
+int blinkCount = 0;  // cycles 0...blinkLimit-1
+int secondCount = 0; // state var representing repeating time 0…1s
+
+void
+__interrupt_vec(WDT_VECTOR) WDT()	/* 250 interrupts/sec */
+{
+  // handle blinking 
+  blinkCount ++;
+  if (blinkCount >= blinkLimit) { // on for 1 interrupt period
+    blinkCount = 0;
+    P1OUT |= LED_GREEN;
+  } else		          // off for blinkLimit - 1 interrupt periods
+    P1OUT &= ~LED_GREEN;
+  
+  // measure a second
+  secondCount ++;
+  if (secondCount >= 250) {  // once each second
+    secondCount = 0;
+    blinkLimit ++;	     // reduce duty cycle
+    if (blinkLimit >= 8)     // but don't let duty cycle go below 1/7.
+      blinkLimit = 0;
+  }
+} 

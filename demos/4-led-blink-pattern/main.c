@@ -29,7 +29,7 @@ __interrupt_vec(WDT_VECTOR) WDT()	/* 250 interrupts/sec */
     P1OUT |= LED_GREEN;
   } else		          // off for blinkLimit - 1 interrupt periods
     P1OUT &= ~LED_GREEN;
-
+  
   // measure a second
   secondCount ++;
   if (secondCount >= 250) {  // once each second

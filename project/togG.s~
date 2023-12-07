@@ -1,0 +1,17 @@
+	.arch msp4302553
+	.p2align 1,0
+	.text
+
+	.global toggle_green
+	.extern red_on, green_on
+
+toggle_green:
+	cmp #0, red_on
+	jz out
+	mov green_on r12
+	XOR r12, #1
+	mov r12, green_on
+	pop 1
+
+out:
+	pop 0

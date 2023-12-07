@@ -19,7 +19,8 @@ char toggle_red()		/* always toggle! */
   return 1;			/* always changes an led */
 }
 
-char toggle_green()	/* only toggle green if red is on!  */
+togG;
+/*char toggle_green()	/* only toggle green if red is on!  
 {
   char changed = 0;
   if (red_on) {
@@ -27,7 +28,7 @@ char toggle_green()	/* only toggle green if red is on!  */
     changed = 1;
   }
   return changed;
-}
+}*/
 
 
 void state_advance()		/* alternate between toggling red & green */

@@ -5,14 +5,14 @@
 #define LED_GREEN BIT6             // P1.6
 #define LEDS (LED_RED | LED_GREEN)
 
-#define SW1 BIT3		/* switch1 is p1.3 */
+#define SW1 BIT0		/* switch1 is p1.3 */
 #define SWITCHES SW1		/* only 1 switch on this board */
 
 void switch_init() {
-  P1REN |= SWITCHES;		/* enables resistors for switches */
-  P1IE |= SWITCHES;		/* enable interrupts from switches */
-  P1OUT |= SWITCHES;		/* pull-ups for switches */
-  P1DIR &= ~SWITCHES;		/* set switches' bits for input */
+  P2REN |= SWITCHES;		/* enables resistors for switches */
+  P2IE |= SWITCHES;		/* enable interrupts from switches */
+  P2OUT |= SWITCHES;		/* pull-ups for switches */
+  P2DIR &= ~SWITCHES;		/* set switches' bits for input */
 }
 
 void led_init() {
@@ -39,11 +39,11 @@ static int buttonDown;
 void
 switch_interrupt_handler()
 {
-  char p1val = P1IN;		/* switch is in P1 */
+  char p1val = P2IN;		/* switch is in P1 */
 
 /* update switch interrupt sense to detect changes from current buttons */
-  P1IES |= (p1val & SWITCHES);	/* if switch up, sense down */
-  P1IES &= (p1val | ~SWITCHES);	/* if switch down, sense up */
+  P2IES |= (p1val & SWITCHES);	/* if switch up, sense down */
+  P2IES &= (p1val | ~SWITCHES);	/* if switch down, sense up */
 
   if (p1val & SW1) {		/* button up */
     P1OUT &= ~LED_GREEN;
@@ -54,12 +54,11 @@ switch_interrupt_handler()
   }
 }
 
-
 /* Switch on P1 (S2) */
 void
-__interrupt_vec(PORT1_VECTOR) Port_1(){
-  if (P1IFG & SWITCHES) {	      /* did a button cause this interrupt? */
-    P1IFG &= ~SWITCHES;		      /* clear pending sw interrupts */
+__interrupt_vec(PORT2_VECTOR) Port_2(){
+  if (P2IFG & SWITCHES) {	      /* did a button cause this interrupt? */
+    P2IFG &= ~SWITCHES;		      /* clear pending sw interrupts */
     switch_interrupt_handler();	/* single handler for all switches */
   }
 }
